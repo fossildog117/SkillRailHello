@@ -4,12 +4,22 @@ angular.module('app.services', ['ngResource'])
     return $resource('https://data.skillrail.com/Token');
   })
 
-  .factory('GetProfile', function ($resource) {
-    return $resource('https://data.skillrail.com/api/MyProfile');
-  })
-
   .factory('SuggestedJobsServ', function ($resource) {
     return $resource('https://data.skillrail.com/Products');
+  })
+
+  .service('GetProfile', function ($http) {
+    return {
+      getProfile: function(token) {
+        return $http({
+          method: 'GET',
+          url: 'https://data.skillrail.com/api/MyProfile',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+      }
+    }
   })
 
   .service('Token', function () {
