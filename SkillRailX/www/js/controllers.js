@@ -46,7 +46,7 @@ angular.module('app.controllers', [])
 
   })
 
-  .controller('loginCtrl', function ($scope, Post, $http, $state, $ionicPopup, Token) {
+  .controller('loginCtrl', function ($scope, Post, $http, $state, $ionicPopup, Token, GetProfile) {
 
     $scope.postData = {};
 
@@ -61,27 +61,29 @@ angular.module('app.controllers', [])
 
         var token = value.data["access_token"];
 
+        console.log(value);
+
         if (value.status == 200) {
           //nathan.liu.15@ucl.ac.uk
           Token.setProperty(token);
-          console.log(token);
 
-          var profile = {
-            Authorization: 'Bearer' + token
-          };
+          $http({
+            method: 'GET',
+            url: 'https://data.skillrail.com/api/MyProfile',
+            headers: {
+              'Authorization': 'Bearer ' + token
+            }
+          }).then(function (response) {
 
-          var returnedProfile = getProfile(profile);
+            if (response.data.isStudent) {
+              $state.go("tabsController.home");
+            } else {
+              $state.go("businessTabsController.home");
+            }
 
-          console.log(returnedProfile);
-
-          //$state.go('tabsController.home');
-
+          });
         }
-
       }, function (value) {
-
-        console.log(value.data);
-
         $ionicPopup.alert({
           title: '',
           template: value.data["error_description"],
@@ -100,7 +102,7 @@ angular.module('app.controllers', [])
         transformRequest: function (data) {
           return angular.isObject(data) && String(data) !== '[object File]' ? serialiseAsParams(data) : data;
         },
-        data: user
+        data: profile
       });
     }
 
