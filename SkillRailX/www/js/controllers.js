@@ -1,6 +1,14 @@
 angular.module('app.controllers', [])
 
-  .controller('profileCtrl', function ($scope) {
+  .controller('profileCtrl', function ($scope, GetProfile, Token) {
+
+    var token = Token.getProperty();
+
+    GetProfile.getProfile(token).then( function (response) {
+
+      console.log(response);
+
+    })
 
   })
 
@@ -13,14 +21,6 @@ angular.module('app.controllers', [])
   })
 
   .controller('search2Ctrl', function ($scope) {
-
-  })
-
-  .controller('loginCtrl', function ($scope) {
-
-  })
-
-  .controller('signupCtrl', function ($scope) {
 
   })
 
@@ -46,6 +46,12 @@ angular.module('app.controllers', [])
 
   })
 
+  // **********************************************************
+  // **                                                      **
+  // **                 Login and Sign Up                    **
+  // **                                                      **
+  // **********************************************************
+
   .controller('loginCtrl', function ($scope, Post, $http, $state, $ionicPopup, Token, GetProfile) {
 
     $scope.postData = {};
@@ -64,16 +70,12 @@ angular.module('app.controllers', [])
         console.log(value);
 
         if (value.status == 200) {
-          //nathan.liu.15@ucl.ac.uk
+
           Token.setProperty(token);
 
-          $http({
-            method: 'GET',
-            url: 'https://data.skillrail.com/api/MyProfile',
-            headers: {
-              'Authorization': 'Bearer ' + token
-            }
-          }).then(function (response) {
+          GetProfile.getProfile(Token.getProperty()).then(function (response) {
+
+            console.log(response);
 
             if (response.data.isStudent) {
               $state.go("tabsController.home");
@@ -91,20 +93,6 @@ angular.module('app.controllers', [])
         });
       });
     };
-
-    function getProfile(profile) {
-      return $http({
-        method: 'GET',
-        url: 'https://data.skillrail.com/api/MyProfile',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-        },
-        transformRequest: function (data) {
-          return angular.isObject(data) && String(data) !== '[object File]' ? serialiseAsParams(data) : data;
-        },
-        data: profile
-      });
-    }
 
     function login(user) {
       return $http({
